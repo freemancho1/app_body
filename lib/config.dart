@@ -1,6 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+/// 앱에서 사용하는 화면 정의(탭에 의해 표시될 화면 정의)
+enum AppScreens {
+  screen1('Screen 1', 1, '',
+      Icon(Icons.widgets_outlined), Icon(Icons.widgets)),
+  screen2('Screen 2', 2, '',
+      Icon(Icons.format_paint_outlined), Icon(Icons.format_paint)),
+  screen3('Screen 3', 3, '',
+      Icon(Icons.text_snippet_outlined), Icon(Icons.text_snippet)),
+  screen4('Screen 4', 4, '',
+      Icon(Icons.invert_colors_on_outlined), Icon(Icons.opacity));
+
+  final String label;
+  final String tooltip;
+  final Icon icon;
+  final Icon selectedIcon;
+  final int screenNo;
+  const AppScreens(
+      this.label,
+      this.screenNo,
+      this.tooltip,
+      this.icon,
+      this.selectedIcon,
+      );
+}
+
+/// 이 아래는 가급적 수정할 필요가 없음.
+/// 이 아래는 가급적 수정할 필요가 없음.
+/// 이 아래는 가급적 수정할 필요가 없음.
+
 class AppCfg {
   /// Material3 Design 사용여부(false면 Material2 Design을 사용함)
   static const bool useMaterial3 = true;
@@ -34,14 +63,15 @@ enum ColorSeed {
   const ColorSeed(this.label, this.color);
 }
 
-/// 앱에서 사용하는 화면 정의(탭에 의해 표시될 화면 정의)
-enum AppScreens {
-  screen1('Screen 1', 1),
-  screen2('Screen 2', 2),
-  screen3('Screen 3', 3),
-  screen4('Screen 4', 4);
-
-  final String label;
-  final int screenNo;
-  const AppScreens(this.label, this.screenNo);
-}
+final List<NavigationRailDestination> pageMenuList = AppScreens.values.toList()
+  .map((screen) => NavigationRailDestination(
+    icon: Tooltip(
+      message: screen.label,
+      child: screen.icon,
+    ),
+    selectedIcon: Tooltip(
+      message: screen.label,
+      child: screen.selectedIcon,
+    ),
+    label: Text(screen.label),
+  )).toList();

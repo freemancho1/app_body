@@ -1,4 +1,5 @@
 import 'package:app_body/config.dart';
+import 'package:app_body/home/home.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -45,7 +46,14 @@ class _FlutterAppState extends State<FlutterApp> {
         useMaterial3: useMaterial3,
         brightness: Brightness.dark
       ),
-      /// Todo: Continue...
+      home: Home(
+        useLightMode: useLightMode,
+        useMaterial3: useMaterial3,
+        colorSeed: colorSeed,
+        handleLightModeToggle: handleLightModeToggle,
+        handleMaterialVersionToggle: handleMaterialVersionToggle,
+        handleSelectColorSeed: handleSelectColorSeed,
+      ),
     );
   }
 }

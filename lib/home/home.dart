@@ -1,4 +1,6 @@
 import 'package:app_body/config.dart';
+import 'package:app_body/home/animations.dart';
+import 'package:app_body/home/option_buttons.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -28,7 +30,8 @@ class _HomeState extends State<Home>
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   late final AnimationController controller;
-  late final CurvedAnimation railAnimation;
+  late final CurvedAnimation leftAnimation;     /// 왼쪽 메뉴바 애니메이션
+  late final ReverseAnimation bottomAnimation;  /// 아래 탭바 애니메이션
 
   /// 이 위젯이 실행후 최초로 실행되나 확인
   /// 처음 실행되는 경우 화면 크기를 확인해 애니메이션을 강제 실행해줌.
@@ -39,8 +42,95 @@ class _HomeState extends State<Home>
   bool isMediumMode = false;
   bool isLargeMode = false;
 
-  /// 화면 번호(초기값: 첫번째 화면 번호)
-  int screenIndex = AppScreens.values[0].screenNo;
+  /// 화면(초기값: 첫번째 화면)
+  AppScreens currentScreen = AppScreens.values[0];
+
+  PreferredSizeWidget createAppBar() {
+    return AppBar(
+      title: Text('Material ${widget.useMaterial3 ? 3: 2}'),
+      /// 작은화면일 때만 액션바에 설정버튼이 표시됨(중간 이상에서는 좌측 메뉴에 표시)
+      actions: isSmallMode
+        ? [
+            ButtonLightModeToggle(
+              actionFunction: widget.handleLightModeToggle,
+              showTooltipBelow: true,
+            ),
+            ButtonMaterialVersionToggle(
+              actionFunction: widget.handleMaterialVersionToggle,
+              showTooltipBelow: true,
+            ),
+            ButtonSelectColorSeed(
+              actionFunction: widget.handleSelectColorSeed,
+              colorSeed: widget.colorSeed,
+              showTooltipBelow: true,
+            ),
+          ]
+        : [Container()],
+    );
+  }
+
+  Widget createScreenFor() {
+    Widget makeBody(String message) {
+      return Expanded(
+        child: Center(
+          child: Text(
+            message,
+            style: Theme.of(context).textTheme.displayMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+      );
+    }
+    switch(currentScreen) {
+      case AppScreens.screen1:
+        return makeBody(AppScreens.screen1.label);
+      case AppScreens.screen2:
+        return makeBody(AppScreens.screen2.label);
+      case AppScreens.screen3:
+        return makeBody(AppScreens.screen3.label);
+      case AppScreens.screen4:
+        return makeBody(AppScreens.screen4.label);
+      default:
+        return makeBody('Default Screen');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        return Scaffold(
+          key: scaffoldKey,
+          appBar: createAppBar(),
+          body: Row(
+            children: [
+              /// 좌측메뉴
+              LeftMenuAnimation(
+                animation: leftAnimation,
+                backgroundColor: colorScheme.surface,
+                child: NavigationRail(
+                  extended: isLargeMode,
+                  destinations: pageMenuList,
+                  selectedIndex: currentScreen.index,
+                  onDestinationSelected: (index) {
+                    setState(() {
+                      currentScreen = AppScreens.values[index];
+                    });
+                  },
+                ),
+              ),
+              /// 본문영역
+              createScreenFor(),
+            ],
+          ),
+        );
+      }
+    );
+  }
 
   @override
   void initState() {
@@ -50,8 +140,14 @@ class _HomeState extends State<Home>
       vsync: this, value: 0,
       duration: Duration(milliseconds: AppCfg.appAnimationDurations.toInt()),
     );
-    railAnimation = CurvedAnimation(
+    leftAnimation = CurvedAnimation(
         parent: controller, curve: const Interval(0, 1)
+    );
+    bottomAnimation = ReverseAnimation(
+        CurvedAnimation(
+          parent: controller,
+          curve: const Interval(0, 0.5),
+        )
     );
   }
 
@@ -107,16 +203,9 @@ class _HomeState extends State<Home>
     }
   }
 
-  PreferredSizeWidget createAppBar() {
-    return AppBar(
-      title: Text('Material ${widget.useMaterial3 ? 3: 2}'),
-      /// 작은화면일 때만 액션바에 설정버튼이 표시됨(중간 이상에서는 좌측 메뉴에 표시)
-      // actions: [],
-    );
+  /// Todo: 이거부터해서 LeftMenus로 전달
+  void handleSelectScreen(int screenIndex) {
+    setState(() => )
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
 }
