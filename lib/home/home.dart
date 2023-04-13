@@ -1,6 +1,9 @@
 import 'package:app_body/config.dart';
 import 'package:app_body/home/animations.dart';
+import 'package:app_body/home/bottom_menus.dart';
+import 'package:app_body/home/left_menus.dart';
 import 'package:app_body/home/option_buttons.dart';
+import 'package:app_body/screens/Screen2.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -48,6 +51,7 @@ class _HomeState extends State<Home>
   PreferredSizeWidget createAppBar() {
     return AppBar(
       title: Text('Material ${widget.useMaterial3 ? 3: 2}'),
+      elevation: 0,
       /// 작은화면일 때만 액션바에 설정버튼이 표시됨(중간 이상에서는 좌측 메뉴에 표시)
       actions: isSmallMode
         ? [
@@ -86,7 +90,7 @@ class _HomeState extends State<Home>
       case AppScreens.screen1:
         return makeBody(AppScreens.screen1.label);
       case AppScreens.screen2:
-        return makeBody(AppScreens.screen2.label);
+        return const Screen2();
       case AppScreens.screen3:
         return makeBody(AppScreens.screen3.label);
       case AppScreens.screen4:
@@ -109,23 +113,25 @@ class _HomeState extends State<Home>
           body: Row(
             children: [
               /// 좌측메뉴
-              LeftMenuAnimation(
+              LeftMenus(
                 animation: leftAnimation,
-                backgroundColor: colorScheme.surface,
-                child: NavigationRail(
-                  extended: isLargeMode,
-                  destinations: pageMenuList,
-                  selectedIndex: currentScreen.index,
-                  onDestinationSelected: (index) {
-                    setState(() {
-                      currentScreen = AppScreens.values[index];
-                    });
-                  },
-                ),
+                screenIndex: currentScreen.index,
+                useMaterial3: widget.useMaterial3,
+                useLightMode: widget.useLightMode,
+                colorSeed: widget.colorSeed,
+                handleMaterialVersionToggle: widget.handleMaterialVersionToggle,
+                handleLightModeToggle: widget.handleLightModeToggle,
+                handleSelectColorSeed: widget.handleSelectColorSeed,
+                handleSelectScreen: handleSelectScreen,
               ),
               /// 본문영역
               createScreenFor(),
             ],
+          ),
+          bottomNavigationBar: BottomMenus(
+            animation: bottomAnimation,
+            screenIndex: currentScreen.index,
+            handleSelectScreen: handleSelectScreen
           ),
         );
       }
@@ -203,9 +209,8 @@ class _HomeState extends State<Home>
     }
   }
 
-  /// Todo: 이거부터해서 LeftMenus로 전달
   void handleSelectScreen(int screenIndex) {
-    setState(() => )
+    setState(() => currentScreen = AppScreens.values[screenIndex]);
   }
 
 }

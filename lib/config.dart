@@ -10,7 +10,10 @@ enum AppScreens {
   screen3('Screen 3', 3, '',
       Icon(Icons.text_snippet_outlined), Icon(Icons.text_snippet)),
   screen4('Screen 4', 4, '',
-      Icon(Icons.invert_colors_on_outlined), Icon(Icons.opacity));
+      Icon(Icons.widgets_outlined), Icon(Icons.widgets)),
+  screen5('Screen 5', 5, '',
+      Icon(Icons.format_paint_outlined), Icon(Icons.format_paint));
+
 
   final String label;
   final String tooltip;
@@ -25,6 +28,8 @@ enum AppScreens {
       this.selectedIcon,
       );
 }
+/// 샘플로 사용하는 데이터로 위 AppScreens 갯 수 만큼 사용하면 됨.
+const List<int> badgeCounts = [1000, 10, 0, 3, 10];
 
 /// 이 아래는 가급적 수정할 필요가 없음.
 /// 이 아래는 가급적 수정할 필요가 없음.
@@ -63,15 +68,42 @@ enum ColorSeed {
   const ColorSeed(this.label, this.color);
 }
 
-final List<NavigationRailDestination> pageMenuList = AppScreens.values.toList()
-  .map((screen) => NavigationRailDestination(
-    icon: Tooltip(
-      message: screen.label,
-      child: screen.icon,
-    ),
-    selectedIcon: Tooltip(
-      message: screen.label,
-      child: screen.selectedIcon,
-    ),
-    label: Text(screen.label),
-  )).toList();
+final List<NavigationRailDestination> pageMenuListInLeft =
+  AppScreens.values.toList().map((screen) {
+    int badge = badgeCounts[screen.index];
+    return NavigationRailDestination(
+      icon: Tooltip(
+        message: screen.label,
+        child: badge > 0
+          ? Badge.count(count: badge, child: screen.icon)
+          : screen.icon,
+      ),
+      selectedIcon: Tooltip(
+        message: screen.label,
+        child: badge > 0
+          ? Badge.count(count: badge, child: screen.selectedIcon,)
+          : screen.selectedIcon,
+      ),
+      label: Text(screen.label)
+    );
+  }).toList();
+
+List<NavigationDestination> pageMenuListInBottom =
+  AppScreens.values.toList().map((screen) {
+    int badge = badgeCounts[screen.index];
+    return NavigationDestination(
+      icon: Tooltip(
+        message: screen.tooltip,
+        child: badge > 0
+          ? Badge.count(count: badge, child: screen.icon)
+          : screen.icon,
+      ),
+      label: screen.label,
+      selectedIcon: Tooltip(
+        message: screen.tooltip,
+        child: badge > 0
+          ? Badge.count(count: badge, child: screen.selectedIcon,)
+          : screen.selectedIcon,
+      ),
+    );
+  }).toList();
